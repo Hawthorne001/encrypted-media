@@ -13,10 +13,10 @@
       implementationReportURI: "https://w3c.github.io/test-results/encrypted-media/all.html",
 
       // the specification's short name, as in https://www.w3.org/TR/short-name/
-      shortName: "encrypted-media",
+      shortName: "encrypted-media-2",
 
-      // if there a publicly available Editor's Draft, this is the link
       edDraftURI: "https://w3c.github.io/encrypted-media/",
+      prevRecURI: "https://www.w3.org/TR/2017/REC-encrypted-media-20170918/",
 
       // editors, add as many as you like
       // only "name" is required
@@ -95,7 +95,42 @@
         license or other server.
       </p>
     </section>
-    <section id="sotd"></section>
+    <section id="sotd">
+      <p>
+        Two new features were added since publication as a <abbr title=
+        "World Wide Web Consortium">W3C</abbr> Recommendation in <a href=
+        "https://www.w3.org/TR/2017/REC-encrypted-media-20170918/">September 2017</a>:
+      </p>
+      <ul>
+        <li>Encryption scheme capability detection, through the
+        {{MediaKeySystemMediaCapability/encryptionScheme}} attribute.
+        </li>
+        <li>The ability to query the status of a key associated with an HDCP policy, through the
+        {{MediaKeys/getStatusForPolicy()}} method.
+        </li>
+      </ul>
+      <p>
+        Inclusion of other features is out of scope for the Media Working Group. On top of
+        editorial updates, other substantive changes made to this specification address maintenance
+        issues against this specification:
+      </p>
+      <ul>
+        <li>Integrate with the Permissions Policy through the [=encrypted-media=] identifier.
+        </li>
+        <li>Add {{MediaKeyStatus/"usable-in-future"}} to {{MediaKeyStatus}} for keys that are not
+        yet usable for decryption.
+        </li>
+        <li>Return [=QuotaExceededError=] when steps fail due to a lack of resources.
+        </li>
+        <li>Add {{MediaKeySessionClosedReason}} to describe possible reasons for a session closure,
+        and adjust algorithms accordingly.
+        </li>
+      </ul>
+      <p>
+        For a full list of changes made since the previous version, see the <a href=
+        "https://github.com/w3c/encrypted-media/commits/main">commits</a>.
+      </p>
+    </section>
     <section class="informative">
       <h2>
         Introduction
@@ -154,7 +189,7 @@
           </p>
         </dd>
         <dt>
-          <dfn data-lt="Key System(s)">Key System</dfn>
+          <dfn class="export">Key System</dfn>
         </dt>
         <dd>
           <p>
@@ -1052,10 +1087,9 @@
                 and use a {{MediaKeys}} object with the provided configuration.
               </p>
               <p>
-                Requests access to the specified [=Key System=]. When
-                <code>supportedConfigurations</code> is specified, the configuration specified by
-                at least one of its elements must be supported. The resulting
-                {{MediaKeySystemAccess}} will correspond to the first such element.
+                Requests access to the specified [=Key System=]. The configuration specified by at
+                least one of its elements must be supported. The resulting {{MediaKeySystemAccess}}
+                will correspond to the first such element.
               </p>
               <p>
                 Any permission checks or user interaction, such as a prompt for consent, MUST be
@@ -1063,8 +1097,8 @@
               </p>
               <p>
                 If the <code>keySystem</code> is not supported or not allowed (in at least one of
-                the <code>supportedConfigurations</code>, if specified), the promise is rejected.
-                Otherwise, it is resolved with a new {{MediaKeySystemAccess}} object.
+                the <code>supportedConfigurations</code>), the promise is rejected. Otherwise, it
+                is resolved with a new {{MediaKeySystemAccess}} object.
               </p>
               <div class="note">
                 <p>
@@ -1221,7 +1255,7 @@
           </h4>
           <section>
             <h5>
-              <dfn>Get Supported Configuration</dfn>
+              <dfn class="export">Get Supported Configuration</dfn>
             </h5>
             <p>
               Given a [=Key Systems=] implementation <var>implementation</var>,
@@ -2979,7 +3013,7 @@
             <div>
               <pre class="idl">
                   dictionary MediaKeysPolicy {
-                      HDCPVersion minHdcpVersion;
+                      DOMString minHdcpVersion;
                   };
                 </pre>
               <p>
@@ -2990,23 +3024,12 @@
               </p>
             </div>
             <div>
-              <pre class="idl">
-                  enum HDCPVersion {
-                      "1.0",
-                      "1.1",
-                      "1.2",
-                      "1.3",
-                      "1.4",
-                      "2.0",
-                      "2.1",
-                      "2.2",
-                      "2.3",
-                  };
-                </pre>
               <p>
-                The HDCP Policy is represented by {{MediaKeysPolicy/minHdcpVersion}}. When set, the
-                policy requirement will be fulfilled if the system supports
-                {{MediaKeysPolicy/minHdcpVersion}} on the current display.
+                The HDCP Policy is represented by {{MediaKeysPolicy/minHdcpVersion}}. If the system
+                can enable the HDCP version specified or higher, then the policy will result in a
+                {{MediaKeyStatus}} of {{MediaKeyStatus/"usable"}}. The
+                [[?EME-HDCP-VERSION-REGISTRY]] provides the mapping from
+                {{MediaKeysPolicy/minHdcpVersion}} values to HDCP specifications.
               </p>
               <p class="note">
                 The determination of HDCP status should be done in the same way that the [=CDM=]
@@ -3026,7 +3049,26 @@
                 <p>
                   Let <var>promise</var> be a new promise.
                 </p>
+              </li>
+              <li>
+                <p>
+                  [=Queue a task=] to run the following steps:
+                </p>
                 <ol>
+                  <li>
+                    <p>
+                      For each [=dictionary member=] of <var>policy</var>, run the following steps:
+                    </p>
+                    <ol>
+                      <li>
+                        <p>
+                          If the key is not a valid {{MediaKeysPolicy}} member or the type of the
+                          value is incorrect, then reject <var>promise</var> with {{TypeError}} and
+                          abort these steps.
+                        </p>
+                      </li>
+                    </ol>
+                  </li>
                   <li>
                     <p>
                       For each [=dictionary member=] of <var>policy</var>, run the following steps:
@@ -3216,17 +3258,23 @@
           <p>
             The CDM unavailable algorithm is run to close all {{MediaKeySession}} objects
             associated with a {{MediaKeys}} object, <var>media keys</var> when the [=CDM=] instance
-            becomes unavailable.
+            becomes unavailable. Requests to run this algorithm include a
+            {{MediaKeySessionClosedReason}} value.
           </p>
           <p>
-            The following step is run:
+            The following steps are run:
           </p>
           <ol>
             <li>
               <p>
+                Let the <var>reason</var> be the specified {{MediaKeySessionClosedReason}} value.
+              </p>
+            </li>
+            <li>
+              <p>
                 For each {{MediaKeySession}} created by the <var>media keys</var> that is not
                 [=media key session/closed=], [=queue a task=] to run the [=Session Closed=]
-                algorithm on the session with reason {{MediaKeyStatus/"internal-error"}}.
+                algorithm on the session with the reason <var>reason</var>.
               </p>
             </li>
           </ol>
@@ -3779,17 +3827,13 @@
                       </li>
                       <li>
                         <p>
-                          Run the [=Queue a "message" Event=] algorithm on the <var>session</var>,
-                          providing <var>message type</var> and <var>message</var>.
+                          Resolve <var>promise</var> with <code>undefined</code>.
                         </p>
                       </li>
                       <li>
                         <p>
-                          Resolve <var>promise</var>.
-                        </p>
-                        <p class="note">
-                          Since promise handlers are queued as microtasks, these will be executed
-                          ahead of any events queued by the preceding steps.
+                          Run the [=Queue a "message" Event=] algorithm on the <var>session</var>,
+                          providing <var>message type</var> and <var>message</var>.
                         </p>
                       </li>
                     </ol>
@@ -4027,18 +4071,14 @@
                       </li>
                       <li>
                         <p>
-                          If <var>message</var> is not null, run the [=Queue a "message" Event=]
-                          algorithm on the <var>session</var>, providing <var>message type</var>
-                          and <var>message</var>.
+                          Resolve <var>promise</var> with <code>true</code>.
                         </p>
                       </li>
                       <li>
                         <p>
-                          Resolve <var>promise</var> with <code>true</code>.
-                        </p>
-                        <p class="note">
-                          Since promise handlers are queued as microtasks, these will be executed
-                          ahead of any events queued by the preceding steps.
+                          If <var>message</var> is not null, run the [=Queue a "message" Event=]
+                          algorithm on the <var>session</var>, providing <var>message type</var>
+                          and <var>message</var>.
                         </p>
                       </li>
                     </ol>
@@ -4363,11 +4403,7 @@
                       </li>
                       <li>
                         <p>
-                          Resolve <var>promise</var>.
-                        </p>
-                        <p class="note">
-                          Since promise handlers are queued as microtasks, these will be executed
-                          ahead of any events queued by the preceding steps.
+                          Resolve <var>promise</var> with <code>undefined</code>.
                         </p>
                       </li>
                     </ol>
@@ -4401,8 +4437,8 @@
             <ol class="method-algorithm">
               <li>
                 <p>
-                  If this object's <var>closing or closed</var> value is true, return a resolved
-                  promise.
+                  If this object's <var>closing or closed</var> value is true, return a promise
+                  resolved with <code>undefined</code>.
                 </p>
               </li>
               <li>
@@ -4448,17 +4484,13 @@
                     <ol>
                       <li>
                         <p>
-                          Run the [=Session Closed=] algorithm on this object with reason
-                          {{MediaKeySessionClosedReason/"closed-by-application"}}.
+                          Resolve <var>promise</var> with <code>undefined</code>.
                         </p>
                       </li>
                       <li>
                         <p>
-                          Resolve <var>promise</var>.
-                        </p>
-                        <p class="note">
-                          Since promise handlers are queued as microtasks, these will be executed
-                          ahead of any events queued by the preceding steps.
+                          Run the [=Session Closed=] algorithm on this object with reason
+                          {{MediaKeySessionClosedReason/"closed-by-application"}}.
                         </p>
                       </li>
                     </ol>
@@ -4620,18 +4652,14 @@
                       </li>
                       <li>
                         <p>
-                          If <var>message</var> is not <code>null</code>, run the [=Queue a
-                          "message" Event=] algorithm on the <var>session</var>, providing
-                          <var>message type</var> and <var>message</var>.
+                          Resolve <var>promise</var> with <code>undefined</code>.
                         </p>
                       </li>
                       <li>
                         <p>
-                          Resolve <var>promise</var>.
-                        </p>
-                        <p class="note">
-                          Since promise handlers are queued as microtasks, these will be executed
-                          ahead of any events queued by the preceding steps.
+                          If <var>message</var> is not <code>null</code>, run the [=Queue a
+                          "message" Event=] algorithm on the <var>session</var>, providing
+                          <var>message type</var> and <var>message</var>.
                         </p>
                       </li>
                     </ol>
@@ -5367,8 +5395,16 @@
             </li>
             <li>
               <p>
-                If <var>cdm</var> has become unavailable, [=queue a task=] to run the [=CDM
-                Unavailable=] algorithm.
+                If <var>cdm</var> has become unavailable due to a hardware context reset, [=queue a
+                task=] to run the [=CDM Unavailable=] algorithm with reason
+                {{MediaKeySessionClosedReason/"hardware-context-reset"}}.
+              </p>
+            </li>
+            <li>
+              <p>
+                If <var>cdm</var> has become unavailable for any other reason, [=queue a task=] to
+                run the [=CDM Unavailable=] algorithm with reason
+                {{MediaKeySessionClosedReason/"internal-error"}}.
               </p>
             </li>
           </ol>
@@ -5723,7 +5759,7 @@
               <li>
                 <p>
                   If <var>mediaKeys</var> and the {{HTMLMediaElement/mediaKeys}} attribute are the
-                  same object, return a resolved promise.
+                  same object, return a promise resolved with <code>undefined</code>.
                 </p>
               </li>
               <li>
@@ -5863,7 +5899,7 @@
                   </li>
                   <li>
                     <p>
-                      Resolve <var>promise</var>.
+                      Resolve <var>promise</var> with <code>undefined</code>.
                     </p>
                   </li>
                 </ol>
@@ -6223,9 +6259,6 @@
                   <p>
                     If <var>cdm</var> is no longer usable for any reason, run the following steps:
                   </p>
-                  <p class="note">
-                    These steps are intended to be run on unrecoverable failures of the [=CDM=].
-                  </p>
                   <ol>
                     <li>
                       <p>
@@ -6235,7 +6268,10 @@
                     </li>
                     <li>
                       <p>
-                        Run the [=CDM Unavailable=] algorithm on <var>media keys</var>.
+                        Run the [=CDM Unavailable=] algorithm on <var>media keys</var> with the
+                        reason {{MediaKeySessionClosedReason/"hardware-context-reset"}} for a
+                        hardware context reset or {{MediaKeySessionClosedReason/"internal-error"}}
+                        otherwise.
                       </p>
                     </li>
                     <li>
@@ -6337,9 +6373,12 @@
                                     </li>
                                     <li>
                                       <p>
-                                        If <var>cdm</var> is no longer usable for any reason then
-                                        run the [=CDM Unavailable=] algorithm on <var>media
-                                        keys</var>.
+                                        If <var>cdm</var> is no longer usable, run the [=CDM
+                                        Unavailable=] algorithm on <var>media keys</var> with the
+                                        reason
+                                        {{MediaKeySessionClosedReason/"hardware-context-reset"}}
+                                        for a hardware context reset, or
+                                        {{MediaKeySessionClosedReason/"internal-error"}} otherwise.
                                       </p>
                                     </li>
                                     <li>
@@ -8096,10 +8135,10 @@
         Privacy
       </h2>
       <p>
-        The presence or use of [=Key System(s)=] on a user's device raises a number of privacy
-        issues, falling into two categories: (a) user-specific information that may be disclosed by
-        the EME interface itself or within [=Key System=] messages and (b) user-specific
-        information that may be persistently stored on the user's device.
+        The presence or use of [=Key System|Key System(s)=] on a user's device raises a number of
+        privacy issues, falling into two categories: (a) user-specific information that may be
+        disclosed by the EME interface itself or within [=Key System=] messages and (b)
+        user-specific information that may be persistently stored on the user's device.
       </p>
       <p>
         User Agents MUST take responsibility for providing users with adequate control over their
