@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en" dir="ltr"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="generator" content="ReSpec 35.4.2">
+<meta name="generator" content="ReSpec 35.5.1">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <style>
 span.example-title{text-transform:none}
@@ -123,7 +123,7 @@ dd{margin-left:0}
 <link rel="stylesheet" href="eme.css">
   
 <meta name="color-scheme" content="light">
-<meta name="revision" content="8a78098555342cf87d277bd94863cadf948c231c">
+<meta name="revision" content="1b9ea6db1992c2c783b5728416906bcf55e2fcba">
 <meta name="description" content="This specification extends HTMLMediaElement [HTML] providing APIs to control playback
         of encrypted content.">
 <style>
@@ -239,16 +239,16 @@ var[data-type]:hover::after,var[data-type]:hover::before{opacity:1}
     "mimesniff",
     "webaudio"
   ],
-  "gitRevision": "8a78098555342cf87d277bd94863cadf948c231c",
-  "publishISODate": "2025-07-15T00:00:00.000Z",
-  "generatedSubtitle": "W3C Editor's Draft 15 July 2025"
+  "gitRevision": "1b9ea6db1992c2c783b5728416906bcf55e2fcba",
+  "publishISODate": "2025-08-22T00:00:00.000Z",
+  "generatedSubtitle": "W3C Editor's Draft 22 August 2025"
 }</script>
 <link rel="stylesheet" href="https://www.w3.org/StyleSheets/TR/2021/W3C-ED"></head>
   <body class="h-entry" data-cite="WEBIDL dom html infra mimesniff webaudio"><div class="head">
     <p class="logos"><a class="logo" href="https://www.w3.org/"><img crossorigin="" alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72">
   </a></p>
     <h1 id="title" class="title">Encrypted Media Extensions</h1> 
-    <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">W3C Editor's Draft</a> <time class="dt-published" datetime="2025-07-15">15 July 2025</time></p>
+    <p id="w3c-state"><a href="https://www.w3.org/standards/types#ED">W3C Editor's Draft</a> <time class="dt-published" datetime="2025-08-22">22 August 2025</time></p>
     <details open="">
       <summary>More details about this document</summary>
       <dl>
@@ -404,7 +404,7 @@ var[data-type]:hover::after,var[data-type]:hover::before{opacity:1}
         
   </p><p>
                       This document is governed by the
-                      <a id="w3c_process_revision" href="https://www.w3.org/policies/process/20231103/">03 November 2023 <abbr title="World Wide Web Consortium">W3C</abbr> Process Document</a>.
+                      <a id="w3c_process_revision" href="https://www.w3.org/policies/process/20250818/">18 August 2025 <abbr title="World Wide Web Consortium">W3C</abbr> Process Document</a>.
                     </p></section><nav id="toc"><h2 class="introductory" id="table-of-contents">Table of Contents</h2><ol class="toc"><li class="tocline"><a class="tocxref" href="#abstract">Abstract</a></li><li class="tocline"><a class="tocxref" href="#sotd">Status of This Document</a></li><li class="tocline"><a class="tocxref" href="#introduction"><bdi class="secno">1. </bdi>
         Introduction
       </a></li><li class="tocline"><a class="tocxref" href="#definitions"><bdi class="secno">2. </bdi>
@@ -3275,7 +3275,7 @@ partial interface <a class="internalDFN idlID" data-link-type="interface" href="
         represents a <a data-link-type="dfn|abstract-op" href="#dfn-cdm" class="internalDFN" id="ref-for-dfn-cdm-32">CDM</a> instance.
       </p>
       <p>
-        A <a data-link-type="idl" data-lt="MediaKeys" href="#dom-mediakeys" class="internalDFN" id="ref-for-dom-mediakeys-13"><code>MediaKeys</code></a> object may be destroyed by the user agent when it is no longer accessible
+        A <a data-link-type="idl" data-lt="MediaKeys" href="#dom-mediakeys" class="internalDFN" id="ref-for-dom-mediakeys-13"><code>MediaKeys</code></a> object may be destroyed by the user agent when it is no longer accessible.
       </p>
       <div class="note" role="note" id="issue-container-generatedID-56"><div role="heading" class="note-title marker" id="h-note-56" aria-level="3"><span>Note</span></div><p class="">
         For example, when there are no script references and no attached media element.
@@ -7815,7 +7815,7 @@ interface <dfn data-export="" data-dfn-type="interface" id="dom-mediaencryptedev
             To ensure accessibility information is available in usable form, for implementations
             that choose to support encrypted in-band support content: a) the <a data-link-type="dfn|abstract-op" href="#dfn-cdm" class="internalDFN" id="ref-for-dfn-cdm-117">CDM</a> <em class="rfc2119">MUST</em> provide
             the decrypted data to the user agent and b) the user agent <em class="rfc2119">MUST</em> process it in the same
-            way as equivalent unencrypted support content. For example, to be exposed as
+            way as equivalent unencrypted support content, for example, to be exposed as
             <a href="https://html.spec.whatwg.org/multipage/#timed-text-tracks">timed text tracks</a> [<cite><a class="bibref" data-link-type="biblio" href="#bib-html" title="HTML Standard">HTML</a></cite>].
           </p>
         </section>
@@ -9676,7 +9676,7 @@ interface <dfn data-export="" data-dfn-type="interface" id="dom-mediaencryptedev
     </dd><dt id="bib-mixed-content">[MIXED-CONTENT]</dt><dd>
       <a href="https://www.w3.org/TR/mixed-content/"><cite>Mixed Content</cite></a>. Emily Stark; Mike West; Carlos IbarraLopez.  W3C. 23 February 2023. CRD. URL: <a href="https://www.w3.org/TR/mixed-content/">https://www.w3.org/TR/mixed-content/</a>
     </dd><dt id="bib-permissions-policy">[PERMISSIONS-POLICY]</dt><dd>
-      <a href="https://www.w3.org/TR/permissions-policy-1/"><cite>Permissions Policy</cite></a>. Ian Clelland.  W3C. 6 May 2025. W3C Working Draft. URL: <a href="https://www.w3.org/TR/permissions-policy-1/">https://www.w3.org/TR/permissions-policy-1/</a>
+      <a href="https://www.w3.org/TR/permissions-policy-1/"><cite>Permissions Policy</cite></a>. Ian Clelland.  W3C. 6 August 2025. W3C Working Draft. URL: <a href="https://www.w3.org/TR/permissions-policy-1/">https://www.w3.org/TR/permissions-policy-1/</a>
     </dd><dt id="bib-rfc2119">[RFC2119]</dt><dd>
       <a href="https://www.rfc-editor.org/rfc/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. S. Bradner.  IETF. March 1997. Best Current Practice. URL: <a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>
     </dd><dt id="bib-rfc6381">[RFC6381]</dt><dd>
